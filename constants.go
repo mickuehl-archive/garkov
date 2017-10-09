@@ -11,5 +11,8 @@ const (
 	FLOAT            int = 8
 	EXCLAMATION_MARK int = 9
 	QUESTION_MARK    int = 10
-	UNKNOWN          int = -1
+	QUOTE_BEGIN      int = 50
+	QUOTE_END        int = 51
+
+	UNKNOWN int = -1
 )

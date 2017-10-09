@@ -43,6 +43,13 @@ func OpenDictionary(name string) *Dictionary {
 			dict.Words[w] = word
 			dict.Size = dict.Size + 1
 		}
+
+		// initialize the word vector
+		dict.V = make([]string, dict.Size)
+		for w := range dict.Words {
+			word := dict.Words[w]
+			dict.V[word.Idx] = word.Word
+		}
 	}
 
 	return &dict

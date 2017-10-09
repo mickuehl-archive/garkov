@@ -13,4 +13,11 @@ type Dictionary struct {
 	Name  string
 	Size  int
 	Words map[string]Word
+	V     []string
+}
+
+type Markov struct {
+	Name  string
+	Depth int
+	Dict  *Dictionary
 }

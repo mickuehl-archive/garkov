@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -12,34 +10,18 @@ import (
 
 func main() {
 
-	if len(os.Args) != 2 {
-		fmt.Printf("usage: %s <path_to_file> \n", filepath.Base(os.Args[0]))
+	if len(os.Args) != 3 {
+		fmt.Printf("usage: %s <model> <path_to_file> \n", filepath.Base(os.Args[0]))
 		os.Exit(1)
 	}
 
-	// open and read the file
-	file, err := os.Open(os.Args[1])
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
+	modelName := os.Args[1]
+	inputFile := os.Args[2]
 
-	// read or create the dictionary
-	dict := garkov.OpenDictionary("test")
-	defer dict.Close()
+	// load the model
+	model := garkov.OpenModel(modelName)
+	defer model.Close()
 
-	fmt.Println(dict)
-
-	// read the file and analyze it
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		dict.AddSentence(scanner.Text())
-	}
-
-	//fmt.Println(dict)
-
-	// some cleanup?
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
+	// add new training text
+	model.TrainModel(inputFile)
 }
