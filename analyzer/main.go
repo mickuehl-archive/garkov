@@ -15,13 +15,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	modelName := os.Args[1]
+	name := os.Args[1]
 	inputFile := os.Args[2]
 
 	// load the model
-	model := garkov.OpenModel(modelName)
+	model := garkov.New(name)
 	defer model.Close()
 
 	// add new training text
-	model.TrainModel(inputFile)
+	model.Train(inputFile)
 }

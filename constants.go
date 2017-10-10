@@ -1,6 +1,7 @@
 package garkov
 
 const (
+	// token types
 	WORD             int = 1
 	STOP             int = 2
 	COMMA            int = 3
@@ -13,6 +14,16 @@ const (
 	QUESTION_MARK    int = 10
 	QUOTE_BEGIN      int = 50
 	QUOTE_END        int = 51
+	UNKNOWN          int = -1
 
-	UNKNOWN int = -1
+	// tuples
+	SENTENCE_START int = 1
+	SENTENCE_MAIN  int = 2
+	SENTENCE_END   int = 3
+
+	QUOTE_START_RUNE rune = -50
+	QUOTE_END_RUNE   rune = -51
+
+	SINGLE_QUOTE rune = -5
+	DOUBLE_QUOTE rune = -6
 )

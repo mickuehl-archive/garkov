@@ -2,27 +2,51 @@ package garkov
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"strings"
 	"text/scanner"
+
+	"github.com/mickuehl/garkov/dictionary"
 )
 
-func OpenModel(name string) *Markov {
+// WordCount the number of occurences of a word from the word vector
+type WordCount struct {
+	Idx   int
+	Count int
+}
+
+// WordChain is the main structure of the model. It represents a prefix and all its suffixes.
+type WordChain struct {
+	Prefix []int                // arrary of words forming the prefix. Index into the dictionaries word vector
+	Type   int                  // the chains position, i.e. start, middle or end of sentence
+	Words  map[string]WordCount // the collection of suffixes and their count
+}
+
+type Markov struct {
+	Name  string                 // name of the model
+	Depth int                    // prefix size
+	Chain map[string]WordChain   // the prefixes mapped to the word chains
+	Dict  *dictionary.Dictionary // the dictionary used in the model
+}
+
+// New creates an empty markov model.
+func New(name string) *Markov {
 
 	m := Markov{
 		Name:  name,
 		Depth: 2,
+		Chain: make(map[string]WordChain),
+		Dict:  dictionary.New(name),
 	}
 
-	m.Dict = OpenDictionary(name)
-	fmt.Println(m.Dict.Words)
-	fmt.Println(m.Dict.V)
+	//fmt.Println(m.Dict.Words)
+	//fmt.Println(m.Dict.V)
 	return &m
 }
 
-func (m *Markov) TrainModel(fileName string) {
+// Train reads an input file and updates the markov model with its content.
+func (m *Markov) Train(fileName string) {
 
 	// open and read the file
 	file, err := os.Open(fileName)
@@ -31,35 +55,75 @@ func (m *Markov) TrainModel(fileName string) {
 	}
 	defer file.Close()
 
-	// read the file line-by-line and tokenize it
-	var tokens []Word
+	// read the file line-by-line and create an array of words
+	var tokens []dictionary.Word
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 
 		line := scanner.Text()
-		tokens = m.StringToTokens(line, tokens)
+		tokens = m.StringToWords(line, tokens)
 	}
 
-	// ready to analyze now
+	// analyze the array of words
 	if len(tokens) > m.Depth+1 {
+		state := SENTENCE_START
 		pos := 0
-		l := len(tokens) - (m.Depth + 1)
-		for pos < l {
 
-			// read the tupel
-			w1 := tokens[pos]
-			w2 := tokens[pos+1]
+		// only so far as there are tuples + a word
+		for pos < len(tokens)-(m.Depth) {
+			prefix := make([]dictionary.Word, m.Depth)
 
-			// read the follower
-			w3 := tokens[pos+2]
+			// read the prefix
+			i := 0
+			for i < m.Depth {
+				prefix[i] = tokens[pos+i]
+				i = i + 1
+			}
 
-			msg := fmt.Sprintf("[%v,%v] -> %v", w1.Word, w2.Word, w3.Word)
-			fmt.Println(msg)
+			// the word following the prefix
+			suffix := tokens[pos+m.Depth]
 
+			// update the chain
+			state = m.Update(prefix, suffix, state)
 			pos = pos + 1
 		}
 	}
 
+	/*
+		for t := range m.Model {
+			seq := m.Model[t]
+			fmt.Println(seq)
+		}
+	*/
+
+}
+
+// Update adds a prefix + suffix to the markov model
+func (m *Markov) Update(prefix []dictionary.Word, suffix dictionary.Word, state int) int {
+
+	_prefix := wordsToPrefixString(prefix)
+	chain, found := m.Chain[_prefix]
+
+	if !found {
+		chain = WordChain{
+			Prefix: wordsToIndexArray(prefix),
+			Type:   state,
+			Words:  make(map[string]WordCount),
+		}
+	}
+
+	// add the word to the sequence
+	chain.AddWord(suffix)
+
+	//fmt.Println(seq)
+
+	// update the model
+	m.Chain[_prefix] = chain
+
+	//msg := fmt.Sprintf("[%v](%v) -> %v", k, state, w)
+	//fmt.Println(msg)
+
+	return state
 }
 
 func (m *Markov) Close() {
@@ -67,10 +131,11 @@ func (m *Markov) Close() {
 
 }
 
-func (m *Markov) StringToTokens(line string, tokens []Word) []Word {
+// StringToWords parse a sentence into an array of words
+func (m *Markov) StringToWords(sentence string, tokens []dictionary.Word) []dictionary.Word {
 
 	var sc scanner.Scanner
-	sc.Init(strings.NewReader(line))
+	sc.Init(strings.NewReader(sentence))
 
 	var tok rune
 	for tok != scanner.EOF {
@@ -78,25 +143,61 @@ func (m *Markov) StringToTokens(line string, tokens []Word) []Word {
 
 		if tok != scanner.EOF {
 
-			if tok == -5 || tok == -6 { // single/double quotes
+			if tok == SINGLE_QUOTE || tok == DOUBLE_QUOTE {
 
-				// open
-				word := m.Dict.Add("QUOTE_BEGIN", QUOTE_BEGIN)
+				// resolve a quote to a sequence of tokens, recursively.
+
+				// open quote
+				word := m.Dict.Add("QUOTE_BEGIN", QUOTE_START_RUNE)
 				tokens = append(tokens, word)
 
 				// sentence without quotes
 				l := sc.TokenText()
-				tokens = m.StringToTokens(l[1:len(l)-1], tokens)
+				tokens = m.StringToWords(l[1:len(l)-1], tokens)
 
-				//close
-				word = m.Dict.Add("QUOTE_END", QUOTE_END)
+				// close quote
+				word = m.Dict.Add("QUOTE_END", QUOTE_END_RUNE)
 				tokens = append(tokens, word)
 			} else {
-				word := m.Dict.Add(sc.TokenText(), tokenType(tok))
+				word := m.Dict.Add(sc.TokenText(), tok)
 				tokens = append(tokens, word)
 			}
 		}
 	}
 
 	return tokens
+}
+
+// AddWord updates a word chain
+func (s *WordChain) AddWord(w dictionary.Word) {
+	words, found := s.Words[w.Word]
+	if found {
+		words.Count = words.Count + 1
+	} else {
+		words = WordCount{
+			Idx:   w.Idx,
+			Count: 1,
+		}
+	}
+	// update
+	s.Words[w.Word] = words
+}
+
+func wordsToPrefixString(prefix []dictionary.Word) string {
+	k := ""
+	for i := range prefix {
+		k = k + prefix[i].Word
+	}
+
+	return k
+}
+
+func wordsToIndexArray(prefix []dictionary.Word) []int {
+	idx := make([]int, len(prefix))
+
+	for i := range prefix {
+		idx[i] = prefix[i].Idx
+	}
+
+	return idx
 }
