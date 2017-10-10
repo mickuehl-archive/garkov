@@ -21,6 +21,10 @@ func (m *Markov) Debug() {
 	}
 	fmt.Println("")
 
+	fmt.Println("Start prefixes:")
+	fmt.Println(m.Start)
+	fmt.Println("")
+
 	fmt.Println("Word Chains:")
 	for prefix := range m.Chain {
 		w := m.Chain[prefix]

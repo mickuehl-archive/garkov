@@ -29,5 +29,5 @@ func main() {
 	model.Debug()
 
 	// spill some sentences
-	fmt.Println(model.Sentence())
+	fmt.Println("Markov says: " + model.Sentence())
 }

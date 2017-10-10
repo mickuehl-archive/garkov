@@ -17,9 +17,12 @@ const (
 	UNKNOWN          int = -1
 
 	// tuples
-	SENTENCE_START int = 1
-	SENTENCE_MAIN  int = 2
-	SENTENCE_END   int = 3
+	SENTENCE_START int = 100
+	SENTENCE_MAIN  int = 200
+	SENTENCE_END   int = 300
+
+	SENTENCE_START_RUNE rune = -60
+	SENTENCE_END_RUNE   rune = -61
 
 	QUOTE_START_RUNE rune = -50
 	QUOTE_END_RUNE   rune = -51

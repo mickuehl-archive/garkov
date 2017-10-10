@@ -23,7 +23,12 @@ const (
 	QUESTION_MARK    int = 10
 	QUOTE_BEGIN      int = 50
 	QUOTE_END        int = 51
-	UNKNOWN          int = -1
+
+	SENTENCE_START int = 100
+	SENTENCE_MAIN  int = 200
+	SENTENCE_END   int = 300
+
+	UNKNOWN int = -1
 )
 
 // Word the basic dictionary structure
@@ -195,6 +200,8 @@ func tokenType(t rune) int {
 		return QUOTE_BEGIN
 	case t == -51:
 		return QUOTE_END
+	case t == -60:
+		return SENTENCE_START
 	case t == 33:
 		return EXCLAMATION_MARK
 	case t == 63:

@@ -23,11 +23,13 @@ type WordChain struct {
 	Words  map[string]WordCount // the collection of suffixes and their count
 }
 
+// Markov wraps all data of a markov-chain into one
 type Markov struct {
 	Name  string                 // name of the model
 	Depth int                    // prefix size
 	Chain map[string]WordChain   // the prefixes mapped to the word chains
 	Dict  *dictionary.Dictionary // the dictionary used in the model
+	Start [][]int                // array of start prefixes
 }
 
 // New creates an empty markov model.
@@ -38,11 +40,13 @@ func New(name string, depth int) *Markov {
 		Depth: depth,
 		Chain: make(map[string]WordChain),
 		Dict:  dictionary.New(name),
+		Start: make([][]int, 0),
 	}
 
 	return &m
 }
 
+// Sentence creates a new sentence based on the markov-chain
 func (m *Markov) Sentence() string {
 	return "42"
 }
@@ -59,6 +63,11 @@ func (m *Markov) Train(fileName string) {
 
 	// read the file line-by-line and create an array of words
 	var tokens []dictionary.Word
+
+	// add a start word
+	word := m.Dict.Add("START", SENTENCE_START_RUNE)
+	tokens = append(tokens, word)
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 
@@ -91,6 +100,25 @@ func (m *Markov) Train(fileName string) {
 		}
 	}
 
+	// create an array of start prefixes
+	m.Start = make([][]int, 0)
+	for c := range m.Chain {
+		prefix := m.Chain[c]
+		if prefix.Prefix[0] == 0 { // assume that the START token is always the first entry in the vector, i.e. has index 0
+			a := make([]int, m.Depth)
+			var b []int
+			a = prefix.Prefix[1:]
+
+			for w := range prefix.Words {
+				// we only expect one ...
+				word := prefix.Words[w]
+				b = append(a, word.Idx)
+			}
+
+			m.Start = append(m.Start, b)
+
+		}
+	}
 }
 
 // Update adds a prefix + suffix to the markov model
@@ -152,6 +180,13 @@ func (m *Markov) StringToWords(sentence string, tokens []dictionary.Word) []dict
 			} else {
 				word := m.Dict.Add(sc.TokenText(), tok)
 				tokens = append(tokens, word)
+
+				if isStopToken(tok) {
+					// Since the current token is a stop token, we have to insert an artificial start token.
+					word := m.Dict.Add("START", SENTENCE_START_RUNE)
+					tokens = append(tokens, word)
+				}
+
 			}
 		}
 	}
@@ -191,4 +226,11 @@ func wordsToIndexArray(prefix []dictionary.Word) []int {
 	}
 
 	return idx
+}
+
+func isStopToken(t rune) bool {
+	if t == 46 {
+		return true
+	}
+	return false
 }
