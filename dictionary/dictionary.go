@@ -148,6 +148,20 @@ func (d *Dictionary) Exists(w string) bool {
 	return found
 }
 
+// Get returns the Word w
+func (d *Dictionary) Get(w string) (Word, bool) {
+	word, found := d.Words[w]
+	return word, found
+}
+
+// GetAt returns the word at word vector index idx
+func (d *Dictionary) GetAt(idx int) (Word, bool) {
+	if idx < 0 || idx > len(d.V) {
+		return Word{}, false
+	}
+	return d.Get(d.V[idx])
+}
+
 // ToS dumps a word into a string
 func (w *Word) ToS() string {
 	return fmt.Sprintf("%v,%v,%v,%v", w.Word, w.Type, w.Count, w.Idx)

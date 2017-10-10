@@ -22,7 +22,7 @@ const (
 	SENTENCE_END   int = 300
 
 	SENTENCE_START_RUNE rune = -60
-	SENTENCE_END_RUNE   rune = -61
+	SENTENCE_END_RUNE   rune = 46
 
 	QUOTE_START_RUNE rune = -50
 	QUOTE_END_RUNE   rune = -51

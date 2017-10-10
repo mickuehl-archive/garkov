@@ -2,10 +2,13 @@ package garkov
 
 import (
 	"bufio"
+	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
 	"text/scanner"
+	"time"
 
 	"github.com/mickuehl/garkov/dictionary"
 )
@@ -48,6 +51,19 @@ func New(name string, depth int) *Markov {
 
 // Sentence creates a new sentence based on the markov-chain
 func (m *Markov) Sentence() string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	sentence := make([]dictionary.Word, m.Depth)
+
+	// select a prefix to start with
+	prefix := m.Start[r.Intn(len(m.Start))]
+	for i := range prefix {
+		w, _ := m.Dict.GetAt(prefix[i])
+		sentence[i] = w
+	}
+	//s := wordsToString(prefix, m.Dict.V)
+	fmt.Println(sentence)
+
 	return "42"
 }
 
@@ -64,15 +80,16 @@ func (m *Markov) Train(fileName string) {
 	// read the file line-by-line and create an array of words
 	var tokens []dictionary.Word
 
-	// add a start word
-	word := m.Dict.Add("START", SENTENCE_START_RUNE)
-	tokens = append(tokens, word)
-
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 
 		line := scanner.Text()
 		tokens = m.StringToWords(line, tokens)
+
+		last := tokens[len(tokens)-1]
+		if last.Type != STOP {
+
+		}
 	}
 
 	// analyze the array of words
@@ -153,6 +170,10 @@ func (m *Markov) Close() {
 // StringToWords parse a sentence into an array of words
 func (m *Markov) StringToWords(sentence string, tokens []dictionary.Word) []dictionary.Word {
 
+	// make sure that the first word is always a START token
+	word := m.Dict.Add("START", SENTENCE_START_RUNE)
+	tokens = append(tokens, word)
+
 	var sc scanner.Scanner
 	sc.Init(strings.NewReader(sentence))
 
@@ -189,6 +210,20 @@ func (m *Markov) StringToWords(sentence string, tokens []dictionary.Word) []dict
 
 			}
 		}
+	}
+
+	// check that we do not end with a START token and the last one is a STOP token
+	last := tokens[len(tokens)-1]
+	if last.Type == SENTENCE_START {
+		// cut off the last element
+		tokens = tokens[:len(tokens)]
+	}
+
+	// make sure we have a proper STOP token
+	last = tokens[len(tokens)-1]
+	if last.Type != STOP {
+		word := m.Dict.Add(".", SENTENCE_END_RUNE)
+		tokens = append(tokens, word)
 	}
 
 	return tokens
