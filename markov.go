@@ -31,17 +31,15 @@ type Markov struct {
 }
 
 // New creates an empty markov model.
-func New(name string) *Markov {
+func New(name string, depth int) *Markov {
 
 	m := Markov{
 		Name:  name,
-		Depth: 2,
+		Depth: depth,
 		Chain: make(map[string]WordChain),
 		Dict:  dictionary.New(name),
 	}
 
-	//fmt.Println(m.Dict.Words)
-	//fmt.Println(m.Dict.V)
 	return &m
 }
 
@@ -89,13 +87,6 @@ func (m *Markov) Train(fileName string) {
 		}
 	}
 
-	/*
-		for t := range m.Model {
-			seq := m.Model[t]
-			fmt.Println(seq)
-		}
-	*/
-
 }
 
 // Update adds a prefix + suffix to the markov model
@@ -120,12 +111,10 @@ func (m *Markov) Update(prefix []dictionary.Word, suffix dictionary.Word, state 
 	// update the model
 	m.Chain[_prefix] = chain
 
-	//msg := fmt.Sprintf("[%v](%v) -> %v", k, state, w)
-	//fmt.Println(msg)
-
 	return state
 }
 
+// Close writes the model to disc
 func (m *Markov) Close() {
 	m.Dict.Close()
 

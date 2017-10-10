@@ -125,7 +125,7 @@ func (d *Dictionary) Add(w string, t rune) Word {
 		Word:  w,
 		Count: 1,
 		Type:  tokenType(t),
-		Idx:   len(d.V),
+		Idx:   len(d.V) - 1,
 	}
 
 	// update the dictionary
