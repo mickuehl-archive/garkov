@@ -43,6 +43,10 @@ func New(name string, depth int) *Markov {
 	return &m
 }
 
+func (m *Markov) Sentence() string {
+	return "42"
+}
+
 // Train reads an input file and updates the markov model with its content.
 func (m *Markov) Train(fileName string) {
 
@@ -105,8 +109,6 @@ func (m *Markov) Update(prefix []dictionary.Word, suffix dictionary.Word, state 
 
 	// add the word to the sequence
 	chain.AddWord(suffix)
-
-	//fmt.Println(seq)
 
 	// update the model
 	m.Chain[_prefix] = chain

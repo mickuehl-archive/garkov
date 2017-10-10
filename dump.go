@@ -27,6 +27,8 @@ func (m *Markov) Debug() {
 		//fmt.Println(w.Prefix)
 		fmt.Println(w.PrettyPrintChain(m.Dict))
 	}
+
+	fmt.Println("")
 }
 
 func PrettyPrintWord(w dictionary.Word) string {

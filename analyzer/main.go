@@ -27,4 +27,7 @@ func main() {
 
 	// dump the model
 	model.Debug()
+
+	// spill some sentences
+	fmt.Println(model.Sentence())
 }
