@@ -21,24 +21,26 @@ type WordChain struct {
 
 // Markov wraps all data of a markov-chain into one
 type Markov struct {
-	Name   string                 // name of the model
-	Depth  int                    // prefix size
-	Chain  map[string]WordChain   // the prefixes mapped to the word chains
-	Dict   *dictionary.Dictionary // the dictionary used in the model
-	Start  [][]int                // array of start prefixes
-	Random *rand.Rand
+	Name     string                 // name of the model
+	Depth    int                    // prefix size
+	Chain    map[string]WordChain   // the prefixes mapped to the word chains
+	Dict     *dictionary.Dictionary // the dictionary used in the model
+	Start    [][]int                // array of start prefixes
+	Language string
+	Random   *rand.Rand
 }
 
 // New creates an empty markov model.
 func New(name string, depth int) *Markov {
 
 	m := Markov{
-		Name:   name,
-		Depth:  depth,
-		Chain:  make(map[string]WordChain),
-		Dict:   dictionary.New(name),
-		Start:  make([][]int, 0),
-		Random: rand.New(rand.NewSource(time.Now().UnixNano())),
+		Name:     name,
+		Depth:    depth,
+		Chain:    make(map[string]WordChain),
+		Dict:     dictionary.New(name),
+		Start:    make([][]int, 0),
+		Language: "en",
+		Random:   rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 
 	return &m

@@ -15,11 +15,12 @@ func (m *Markov) Build(fileName string) {
 	var tokens []dictionary.Word
 
 	tokenizer := tokenize.NewTreebankWordTokenizer()
-	sentenizer, _ := tokenize.NewPragmaticSegmenter("en")
+	sentenizer, _ := tokenize.NewPragmaticSegmenter(m.Language)
 
 	all, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		fmt.Print(err)
+		return
 	}
 
 	// split the text into complete sentences fist, regardless of the individual lines.
@@ -30,11 +31,8 @@ func (m *Markov) Build(fileName string) {
 			prefix := make([]int, m.Depth)
 			_prefix := 0
 
-			//fmt.Println("Sentence: " + sentence)
-
 			// now split the sentence into words
 			for _, w := range tokenizer.Tokenize(sentence) {
-				//fmt.Println(w)
 				word = m.Dict.Add(w)
 				tokens = append(tokens, word)
 
