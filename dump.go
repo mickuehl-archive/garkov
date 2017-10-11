@@ -9,6 +9,8 @@ import (
 // Debug prints the model for debugging
 func (m *Markov) Debug() {
 
+	fmt.Println("\nDumping model ...\n")
+
 	// the word vector
 	fmt.Println("Words:")
 	fmt.Println(m.Dict.V)

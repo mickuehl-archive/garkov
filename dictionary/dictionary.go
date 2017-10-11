@@ -13,8 +13,10 @@ const (
 	WORD    int = 1
 	INTEGER int = 2
 	FLOAT   int = 3
+	STOP    int = 10
 
-	STOP             int = 20
+	START int = 101
+
 	COMMA            int = 21
 	HYPHEN           int = 22
 	COLON            int = 23
@@ -26,9 +28,10 @@ const (
 	QUOTE_END   int = 51
 
 	// token types
-	SENTENCE_START int = 100
-	SENTENCE_MAIN  int = 200
-	SENTENCE_END   int = 300
+	//SENTENCE_START_TOKEN string = "##@"
+	//SENTENCE_START       int    = 100
+	SENTENCE_END_TOKEN string = "."
+	SENTENCE_END       int    = STOP
 
 	UNKNOWN int = -1
 )
@@ -58,6 +61,9 @@ func New(name string) *Dictionary {
 		Words: make(map[string]Word),
 		V:     make([]string, 0),
 	}
+
+	// add default words
+	dict.AddWithType(SENTENCE_END_TOKEN, SENTENCE_END)
 
 	return &dict
 
@@ -114,7 +120,11 @@ func (d *Dictionary) Close() {
 }
 
 // Add add a word to the dictionary
-func (d *Dictionary) Add(w string, t rune) Word {
+func (d *Dictionary) Add(w string) Word {
+	return d.AddWithType(w, tokenType(w))
+}
+
+func (d *Dictionary) AddWithType(w string, t int) Word {
 
 	word, found := d.Words[w]
 	if found {
@@ -131,7 +141,7 @@ func (d *Dictionary) Add(w string, t rune) Word {
 	word = Word{
 		Word:  w,
 		Count: 1,
-		Type:  tokenType(t),
+		Type:  t,
 		Idx:   len(d.V) - 1,
 	}
 
@@ -194,6 +204,15 @@ func parseWord(s string) (string, Word, error) {
 	return w.Word, w, nil
 }
 
+func tokenType(t string) int {
+	if t == "." {
+		return STOP
+	}
+
+	return WORD
+}
+
+/*
 func tokenType(t rune) int {
 	switch {
 	case t == -2:
@@ -226,3 +245,4 @@ func tokenType(t rune) int {
 
 	return UNKNOWN
 }
+*/
