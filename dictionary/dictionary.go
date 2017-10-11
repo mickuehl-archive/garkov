@@ -29,12 +29,15 @@ type Word struct {
 	Count int
 }
 
+type WordMap map[string]Word
+type WordVector []string
+
 // Dictionary the collection of words
 type Dictionary struct {
-	Name  string          // name of the dictionary
-	Size  int             // number of words in the dictionary
-	Words map[string]Word // map of words and their stats
-	V     []string        // the word vector
+	Name  string     // name of the dictionary
+	Size  int        // number of words in the dictionary
+	Words WordMap    // map of words and their stats
+	V     WordVector // the word vector
 }
 
 // New creates and initialize a new dictionary
