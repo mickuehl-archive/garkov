@@ -3,9 +3,8 @@
 *.dll
 *.so
 *.dylib
-analyzer/analyzer
-analyzer/debug
-test/test
+
+cmd/debug/**
 
 # Test binary, build with `go test -c`
 *.test

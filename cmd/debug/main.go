@@ -17,36 +17,26 @@ const (
 
 func main() {
 
-	if len(os.Args) <= (numParams + 1) {
-		fmt.Printf("usage: %s <model depth> <path_to_file>, <path_to_file> ... \n", filepath.Base(os.Args[0]))
+	if len(os.Args) < (numParams + 1) {
+		fmt.Printf("usage: %s <prefix length> <path_to_file>, <path_to_file> ... \n", filepath.Base(os.Args[0]))
 		os.Exit(1)
 	}
 
-	depth, _ := strconv.Atoi(os.Args[1])
+	// the prefix length
+	prefix, _ := strconv.Atoi(os.Args[1])
 
-	// load the model
-	model := garkov.New("test", depth)
-	defer model.Close()
+	// initiate the model
+	model := garkov.New("test", prefix)
 
-	// add new training text
-	//model.Train("../texts/grim1.txt") // afther death
-	//model.Train("../texts/grim2.txt") // red-riding hood
-	//model.Train("../texts/grim3.txt") // Hansel and Gretel
-
-	model.Train("../texts/war_and_piece.txt")
-	model.Train("../texts/anna_karenina.txt")
-
-	// dump the model
-	//model.Debug()
-
-	fmt.Println("\nMarkov says:\n")
-
-	i := 0
-	for i < num {
-		fmt.Println(model.Sentence(minWords, maxWords))
+	// load the files
+	i := 2
+	for i < len(os.Args) {
+		fmt.Println("Reading file: " + os.Args[i])
+		model.Train(os.Args[i])
 		i = i + 1
 	}
 
-	fmt.Println("")
+	// dump the model
+	model.Debug()
 
 }
