@@ -17,7 +17,7 @@ test/test
 .glide/
 .vscode/
 
-# dictionaries & markovs
+# dictionaries & markovs, input text files
 *.dict
 *.mark
-*.nsfw
+*.txt
