@@ -35,7 +35,7 @@ func wordsToIndexArray(prefix []dictionary.Word) []int {
 func wordsToSentence(sentence []dictionary.Word) string {
 	k := ""
 	for i := range sentence {
-		if sentence[i].Type < 10 {
+		if sentence[i].Type < dictionary.STOP {
 			k = k + " " + sentence[i].Word
 		} else {
 			k = k + sentence[i].Word
@@ -43,11 +43,4 @@ func wordsToSentence(sentence []dictionary.Word) string {
 	}
 
 	return k
-}
-
-func isStopToken(t rune) bool {
-	if t == 46 {
-		return true
-	}
-	return false
 }

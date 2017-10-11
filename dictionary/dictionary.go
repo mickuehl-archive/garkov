@@ -10,30 +10,15 @@ import (
 )
 
 const (
-	WORD    int = 1
-	INTEGER int = 2
-	FLOAT   int = 3
-	STOP    int = 20
+	WORD int = 1
 
-	START int = 101
+	PUNCTUATION int = 20 // .!?
+	STOP        int = 20
+	COLON       int = 22 // ,
+	SEMICOLON   int = 23 // ;
 
-	COMMA            int = 21
-	HYPHEN           int = 22
-	COLON            int = 23
-	SEMICOLON        int = 24
-	EXCLAMATION_MARK int = 25
-	QUESTION_MARK    int = 26
-
-	QUOTE_BEGIN int = 50
-	QUOTE_END   int = 51
-
-	// token types
-	//SENTENCE_START_TOKEN string = "##@"
-	//SENTENCE_START       int    = 100
 	SENTENCE_END_TOKEN string = "."
 	SENTENCE_END       int    = STOP
-
-	UNKNOWN int = -1
 )
 
 // Word the basic dictionary structure
@@ -205,10 +190,33 @@ func parseWord(s string) (string, Word, error) {
 }
 
 func tokenType(t string) int {
-	if t == "." {
-		return STOP
+
+	// most common case ...
+	if len(t) > 1 {
+		return WORD
 	}
 
+	if t == "." {
+		return PUNCTUATION
+	}
+
+	if t == "," {
+		return COLON
+	}
+
+	if t == "!" {
+		return PUNCTUATION
+	}
+
+	if t == "?" {
+		return PUNCTUATION
+	}
+
+	if t == ";" {
+		return SEMICOLON
+	}
+
+	// not sure, let's call it a WORD
 	return WORD
 }
 
