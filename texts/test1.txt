@@ -1,0 +1,9 @@
+A b c d e. f. a
+b a
+.
+
+B b a: "A b b".
+B b's "a b'c *a* f 
+b b?" #a. A @b c, c.
+A 42 pi 3.1415 or 3,1415 a.
+B a "a 'b b' c" a
