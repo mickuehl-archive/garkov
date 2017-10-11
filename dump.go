@@ -28,7 +28,6 @@ func (m *Markov) Debug() {
 	fmt.Println("Word Chains:")
 	for prefix := range m.Chain {
 		w := m.Chain[prefix]
-		//fmt.Println(w.Prefix)
 		fmt.Println(w.PrettyPrintChain(m.Dict))
 	}
 

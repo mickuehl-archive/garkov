@@ -2,7 +2,6 @@ package garkov
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -28,43 +27,63 @@ type WordChain struct {
 
 // Markov wraps all data of a markov-chain into one
 type Markov struct {
-	Name  string                 // name of the model
-	Depth int                    // prefix size
-	Chain map[string]WordChain   // the prefixes mapped to the word chains
-	Dict  *dictionary.Dictionary // the dictionary used in the model
-	Start [][]int                // array of start prefixes
+	Name   string                 // name of the model
+	Depth  int                    // prefix size
+	Chain  map[string]WordChain   // the prefixes mapped to the word chains
+	Dict   *dictionary.Dictionary // the dictionary used in the model
+	Start  [][]int                // array of start prefixes
+	Random *rand.Rand
 }
 
 // New creates an empty markov model.
 func New(name string, depth int) *Markov {
 
 	m := Markov{
-		Name:  name,
-		Depth: depth,
-		Chain: make(map[string]WordChain),
-		Dict:  dictionary.New(name),
-		Start: make([][]int, 0),
+		Name:   name,
+		Depth:  depth,
+		Chain:  make(map[string]WordChain),
+		Dict:   dictionary.New(name),
+		Start:  make([][]int, 0),
+		Random: rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 
 	return &m
 }
 
 // Sentence creates a new sentence based on the markov-chain
-func (m *Markov) Sentence() string {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+func (m *Markov) Sentence(minWords, maxWords int) string {
 
 	sentence := make([]dictionary.Word, m.Depth)
 
-	// select a prefix to start with
-	prefix := m.Start[r.Intn(len(m.Start))]
-	for i := range prefix {
-		w, _ := m.Dict.GetAt(prefix[i])
+	// select a first prefix to start with
+	_prefix := m.Start[m.Random.Intn(len(m.Start))]
+	for i := range _prefix {
+		w, _ := m.Dict.GetAt(_prefix[i])
 		sentence[i] = w
 	}
-	//s := wordsToString(prefix, m.Dict.V)
-	fmt.Println(sentence)
+	prefix := sentence
 
-	return "42"
+	n := 0
+	for {
+		// get the next word, until we get a STOP word
+		suffix := m.SuffixFor(prefix)
+		sentence = append(sentence, suffix)
+
+		if suffix.Type == STOP && n >= minWords {
+			break
+		}
+
+		// new prefix
+		prefix = sentence[len(sentence)-m.Depth:]
+		n = n + 1
+
+		if n > maxWords {
+			break // emergency break
+		}
+
+	}
+
+	return wordsToSentence(sentence)
 }
 
 // Train reads an input file and updates the markov model with its content.
@@ -167,6 +186,34 @@ func (m *Markov) Close() {
 
 }
 
+// SuffixFor returns a word that succeedes a given prefix
+func (m *Markov) SuffixFor(prefix []dictionary.Word) dictionary.Word {
+
+	// lookup the word chain
+	_prefix := wordsToPrefixString(prefix)
+	chain, found := m.Chain[_prefix]
+
+	if found {
+		idx := 0
+		max := m.Random.Intn(len(chain.Words))
+		i := 0
+		// FIXME poor implementation of a random lookup ... need a better way
+		for p := range chain.Words {
+			if i == max {
+				idx = chain.Words[p].Idx
+				break
+			}
+			i = i + 1
+		}
+
+		word, _ := m.Dict.GetAt(idx)
+		return word
+	}
+
+	// FIXME we should never get here ...
+	return dictionary.Word{}
+}
+
 // StringToWords parse a sentence into an array of words
 func (m *Markov) StringToWords(sentence string, tokens []dictionary.Word) []dictionary.Word {
 
@@ -253,6 +300,15 @@ func wordsToPrefixString(prefix []dictionary.Word) string {
 	return k
 }
 
+func indexToPrefixString(prefix []int, dict *dictionary.Dictionary) string {
+	k := ""
+	for i := range prefix {
+		k = k + dict.V[prefix[i]]
+	}
+
+	return k
+}
+
 func wordsToIndexArray(prefix []dictionary.Word) []int {
 	idx := make([]int, len(prefix))
 
@@ -261,6 +317,19 @@ func wordsToIndexArray(prefix []dictionary.Word) []int {
 	}
 
 	return idx
+}
+
+func wordsToSentence(sentence []dictionary.Word) string {
+	k := ""
+	for i := range sentence {
+		if sentence[i].Type == WORD {
+			k = k + " " + sentence[i].Word
+		} else {
+			k = k + sentence[i].Word
+		}
+	}
+
+	return k
 }
 
 func isStopToken(t rune) bool {

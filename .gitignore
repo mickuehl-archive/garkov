@@ -5,6 +5,7 @@
 *.dylib
 analyzer/analyzer
 analyzer/debug
+test/test
 
 # Test binary, build with `go test -c`
 *.test

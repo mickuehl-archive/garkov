@@ -19,7 +19,7 @@ func main() {
 	inputFile := os.Args[2]
 
 	// load the model
-	model := garkov.New(name, 2)
+	model := garkov.New(name, 3)
 	defer model.Close()
 
 	// add new training text
@@ -29,5 +29,5 @@ func main() {
 	model.Debug()
 
 	// spill some sentences
-	fmt.Println("Markov says: " + model.Sentence())
+	fmt.Println("Markov says: " + model.Sentence(6, 20))
 }
