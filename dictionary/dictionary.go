@@ -13,7 +13,7 @@ const (
 	WORD    int = 1
 	INTEGER int = 2
 	FLOAT   int = 3
-	STOP    int = 10
+	STOP    int = 20
 
 	START int = 101
 
