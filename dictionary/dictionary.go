@@ -10,20 +10,22 @@ import (
 )
 
 const (
-	// token types
-	WORD             int = 1
-	STOP             int = 2
-	COMMA            int = 3
-	HYPHEN           int = 4
-	COLON            int = 5
-	SEMICOLON        int = 6
-	INTEGER          int = 7
-	FLOAT            int = 8
-	EXCLAMATION_MARK int = 9
-	QUESTION_MARK    int = 10
-	QUOTE_BEGIN      int = 50
-	QUOTE_END        int = 51
+	WORD    int = 1
+	INTEGER int = 2
+	FLOAT   int = 3
 
+	STOP             int = 20
+	COMMA            int = 21
+	HYPHEN           int = 22
+	COLON            int = 23
+	SEMICOLON        int = 24
+	EXCLAMATION_MARK int = 25
+	QUESTION_MARK    int = 26
+
+	QUOTE_BEGIN int = 50
+	QUOTE_END   int = 51
+
+	// token types
 	SENTENCE_START int = 100
 	SENTENCE_MAIN  int = 200
 	SENTENCE_END   int = 300

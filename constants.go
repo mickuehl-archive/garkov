@@ -2,19 +2,6 @@ package garkov
 
 const (
 	// token types
-	WORD             int = 1
-	STOP             int = 2
-	COMMA            int = 3
-	HYPHEN           int = 4
-	COLON            int = 5
-	SEMICOLON        int = 6
-	INTEGER          int = 7
-	FLOAT            int = 8
-	EXCLAMATION_MARK int = 9
-	QUESTION_MARK    int = 10
-	QUOTE_BEGIN      int = 50
-	QUOTE_END        int = 51
-	UNKNOWN          int = -1
 
 	// tuples
 	SENTENCE_START int = 100

@@ -69,7 +69,7 @@ func (m *Markov) Sentence(minWords, maxWords int) string {
 		suffix := m.SuffixFor(prefix)
 		sentence = append(sentence, suffix)
 
-		if suffix.Type == STOP && n >= minWords {
+		if suffix.Type == dictionary.STOP && n >= minWords {
 			break
 		}
 
@@ -106,7 +106,7 @@ func (m *Markov) Train(fileName string) {
 		tokens = m.StringToWords(line, tokens)
 
 		last := tokens[len(tokens)-1]
-		if last.Type != STOP {
+		if last.Type != dictionary.STOP {
 
 		}
 	}
@@ -268,7 +268,7 @@ func (m *Markov) StringToWords(sentence string, tokens []dictionary.Word) []dict
 
 	// make sure we have a proper STOP token
 	last = tokens[len(tokens)-1]
-	if last.Type != STOP {
+	if last.Type != dictionary.STOP {
 		word := m.Dict.Add(".", SENTENCE_END_RUNE)
 		tokens = append(tokens, word)
 	}
@@ -289,52 +289,4 @@ func (s *WordChain) AddWord(w dictionary.Word) {
 	}
 	// update
 	s.Words[w.Word] = words
-}
-
-func wordsToPrefixString(prefix []dictionary.Word) string {
-	k := ""
-	for i := range prefix {
-		k = k + prefix[i].Word
-	}
-
-	return k
-}
-
-func indexToPrefixString(prefix []int, dict *dictionary.Dictionary) string {
-	k := ""
-	for i := range prefix {
-		k = k + dict.V[prefix[i]]
-	}
-
-	return k
-}
-
-func wordsToIndexArray(prefix []dictionary.Word) []int {
-	idx := make([]int, len(prefix))
-
-	for i := range prefix {
-		idx[i] = prefix[i].Idx
-	}
-
-	return idx
-}
-
-func wordsToSentence(sentence []dictionary.Word) string {
-	k := ""
-	for i := range sentence {
-		if sentence[i].Type == WORD {
-			k = k + " " + sentence[i].Word
-		} else {
-			k = k + sentence[i].Word
-		}
-	}
-
-	return k
-}
-
-func isStopToken(t rune) bool {
-	if t == 46 {
-		return true
-	}
-	return false
 }
