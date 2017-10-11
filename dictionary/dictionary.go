@@ -79,8 +79,7 @@ func Open(name string) *Dictionary {
 
 		// initialize the word vector
 		dict.V = make([]string, dict.Size)
-		for w := range dict.Words {
-			word := dict.Words[w]
+		for _, word := range dict.Words {
 			dict.V[word.Idx] = word.Word
 		}
 	}
@@ -96,8 +95,7 @@ func (d *Dictionary) Close() {
 	f, err := os.Create(fileName)
 
 	if err == nil {
-		for w := range d.Words {
-			word := d.Words[w]
+		for _, word := range d.Words {
 			f.Write([]byte(word.ToS() + "\n"))
 		}
 		f.Close()
@@ -219,38 +217,3 @@ func tokenType(t string) int {
 	// not sure, let's call it a WORD
 	return WORD
 }
-
-/*
-func tokenType(t rune) int {
-	switch {
-	case t == -2:
-		return WORD
-	case t == 46:
-		return STOP
-	case t == 44:
-		return COMMA
-	case t == 45:
-		return HYPHEN
-	case t == 58:
-		return COLON
-	case t == 59:
-		return SEMICOLON
-	case t == -3:
-		return INTEGER
-	case t == -4:
-		return FLOAT
-	case t == -50:
-		return QUOTE_BEGIN
-	case t == -51:
-		return QUOTE_END
-	case t == -60:
-		return SENTENCE_START
-	case t == 33:
-		return EXCLAMATION_MARK
-	case t == 63:
-		return QUESTION_MARK
-	}
-
-	return UNKNOWN
-}
-*/

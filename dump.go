@@ -19,7 +19,7 @@ func (m *Markov) Debug() {
 	// the dictionary itself
 	fmt.Println("Dictionary:")
 	for w := range m.Dict.Words {
-		fmt.Println(PrettyPrintWord(m.Dict.Words[w]))
+		fmt.Println(prettyPrintWord(m.Dict.Words[w]))
 	}
 	fmt.Println("")
 
@@ -28,15 +28,14 @@ func (m *Markov) Debug() {
 	fmt.Println("")
 
 	fmt.Println("Word Chains:")
-	for prefix := range m.Chain {
-		w := m.Chain[prefix]
-		fmt.Println(w.PrettyPrintChain(m.Dict))
+	for _, suffix := range m.Chain {
+		fmt.Println(suffix.PrettyPrintChain(m.Dict))
 	}
 
 	fmt.Println("")
 }
 
-func PrettyPrintWord(w dictionary.Word) string {
+func prettyPrintWord(w dictionary.Word) string {
 	return fmt.Sprintf("%v: %v[%v,%v]", w.Idx, w.Word, w.Type, w.Count)
 }
 
