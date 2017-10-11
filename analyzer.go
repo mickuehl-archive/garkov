@@ -33,6 +33,11 @@ func (m *Markov) Build(fileName string) {
 
 			// now split the sentence into words
 			for _, w := range tokenizer.Tokenize(sentence) {
+
+				if filter(w) {
+					continue
+				}
+
 				word = m.Dict.Add(w)
 				tokens = append(tokens, word)
 
@@ -77,4 +82,24 @@ func (m *Markov) Build(fileName string) {
 		}
 	}
 
+}
+
+func filter(w string) bool {
+	if len(w) > 2 {
+		return false
+	}
+
+	if w == "\"" {
+		return true
+	}
+
+	if w == "``" {
+		return true
+	}
+
+	if w == "''" {
+		return true
+	}
+
+	return false
 }

@@ -11,8 +11,6 @@ import (
 
 const (
 	numParams int = 2
-	minWords  int = 4
-	maxWords  int = 40
 )
 
 func main() {
@@ -31,8 +29,35 @@ func main() {
 	// load the files
 	i := 2
 	for i < len(os.Args) {
-		fmt.Println("Reading file: " + os.Args[i])
-		model.Build(os.Args[i])
+		fileOrDir := os.Args[i]
+
+		fi, err := os.Stat(fileOrDir)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		if fi.IsDir() {
+			fmt.Println("Scanning directory: " + fileOrDir)
+
+			fileList := []string{}
+			filepath.Walk(fileOrDir, func(path string, f os.FileInfo, err error) error {
+				fileList = append(fileList, path)
+				return nil
+			})
+
+			fileList = fileList[1:] // remove the first entry, its the directory itself
+
+			for _, file := range fileList {
+				fmt.Println("Reading file: " + file)
+				model.Build(file)
+			}
+
+		} else {
+			fmt.Println("Reading file: " + fileOrDir)
+			model.Build(fileOrDir)
+		}
+
 		i = i + 1
 	}
 
