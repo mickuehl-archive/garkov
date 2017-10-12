@@ -5,7 +5,8 @@
 *.dylib
 
 cmd/debug/**
-cmd/test/**
+cmd/markov/**
+cmd/split/**
 
 # Test binary, build with `go test -c`
 *.test
